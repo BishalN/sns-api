@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  password   String
+  followers  Follower[] @relation("followers")
+  following  Follower[] @relation("following")
+
+  recordings Recording[]
+  recordingLikes RecordingLike[]
+  recordingComments Comment[]
+}
+
+model Follower {
+  id        Int   @id @default(autoincrement())
+  follower  User  @relation("following", fields: [followerId], references: [id])
+  followerId Int
+  following User  @relation("followers", fields: [followingId], references: [id])
+  followingId Int
+
+  @@unique([followerId, followingId])
+}
+
+
+model Recording {
+  id          Int        @id @default(autoincrement())
+  title       String
+  url         String
+  isPublic    Boolean
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+  likes       RecordingLike[]
+  comments    Comment[]
+}
+
+model RecordingLike {
+  id          Int        @id @default(autoincrement())
+  userId      Int
+  recordingId Int
+  user        User       @relation(fields: [userId], references: [id])
+  recording   Recording  @relation(fields: [recordingId], references: [id])
+}
+
+model Comment {
+  id          Int        @id @default(autoincrement())
+  content     String
+  userId      Int
+  recordingId Int
+  user        User       @relation(fields: [userId], references: [id])
+  recording   Recording  @relation(fields: [recordingId], references: [id])
+}
+
+
