@@ -1,6 +1,12 @@
 import { createRoute } from "@hono/zod-openapi";
 import { z } from "zod";
-import { RecordingModel } from "../../../prisma/zod";
+import {
+  CommentModel,
+  LikeModel,
+  RecordingModel,
+  RelatedRecordingModel,
+} from "../../../prisma/zod";
+import { TestRes } from "./services";
 
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 export const generatePresignedUrlRoute = createRoute({
@@ -116,12 +122,43 @@ export const getRecordingByIdRoute = createRoute({
       description: "Recording found",
       content: {
         "application/json": {
-          schema: RecordingModel,
+          // TODO: infer the type from the service response and use it here
+          schema: TestRes,
         },
       },
     },
     404: {
       description: "Recording not found",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+  },
+  tags: ["recording"],
+});
+
+export const getMyRecordingsRoute = createRoute({
+  method: "get",
+  path: "/me",
+  security: [{ Bearer: [] }],
+  request: {
+    headers: z.object({
+      authorize: z.string(),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Recordings found",
+      content: {
+        "application/json": {
+          schema: z.array(RecordingModel),
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
       content: {
         "application/json": {
           schema: z.object({ message: z.string() }),
@@ -182,6 +219,7 @@ export const updateRecordingRoute = createRoute({
 export const deleteRecordingRoute = createRoute({
   method: "delete",
   path: "/{id}",
+  description: "Delete recording",
   security: [{ Bearer: [] }],
   request: {
     headers: z.object({
@@ -210,4 +248,189 @@ export const deleteRecordingRoute = createRoute({
     },
   },
   tags: ["recording"],
+});
+
+export const toggleLikeRecording = createRoute({
+  method: "put",
+  path: "/{id}/like",
+  description: "Toggle like on recording",
+  security: [{ Bearer: [] }],
+  request: {
+    headers: z.object({
+      authorize: z.string(),
+    }),
+    params: z.object({
+      id: z.string(),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Toggle Recording like",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    404: {
+      description: "Recording not found",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+  },
+});
+
+export const createRecordingComment = createRoute({
+  method: "post",
+  path: "/{id}/comment",
+  description: "Create comment on recording",
+  security: [{ Bearer: [] }],
+  request: {
+    headers: z.object({
+      authorize: z.string(),
+    }),
+    params: z.object({
+      id: z.string().openapi({
+        description: "Recording ID",
+      }),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: CommentModel.pick({ content: true }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Comment created",
+      content: {
+        "application/json": {
+          schema: CommentModel,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    404: {
+      description: "Recording not found",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+  },
+});
+
+export const updateRecordingComment = createRoute({
+  method: "put",
+  path: "/{id}/comment",
+  description: "Update comment on recording",
+  security: [{ Bearer: [] }],
+  request: {
+    headers: z.object({
+      authorize: z.string(),
+    }),
+    params: z.object({
+      id: z.string().openapi({
+        description: "Recording ID",
+      }),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: CommentModel.pick({ content: true, id: true }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Comment updated",
+      content: {
+        "application/json": {
+          schema: CommentModel,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    404: {
+      description: "Recording or Comment not found",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+  },
+});
+
+export const deleteRecordingComment = createRoute({
+  method: "delete",
+  path: "/{id}/comment/{commentId}",
+  description: "Delete comment on recording",
+  security: [{ Bearer: [] }],
+  request: {
+    headers: z.object({
+      authorize: z.string(),
+    }),
+    params: z.object({
+      id: z.string().openapi({
+        description: "Recording ID",
+      }),
+      commentId: z.string(),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Comment deleted",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    404: {
+      description: "Recording or Comment not found",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+  },
 });

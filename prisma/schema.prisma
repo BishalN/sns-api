@@ -25,7 +25,7 @@ model User {
   following  Follower[] @relation("following")
 
   recordings Recording[]
-  recordingLikes RecordingLike[]
+  recordingLikes Like[]
   recordingComments Comment[]
 }
 
@@ -47,11 +47,11 @@ model Recording {
   isPublic    Boolean
   userId      Int
   user        User       @relation(fields: [userId], references: [id])
-  likes       RecordingLike[]
+  likes       Like[]
   comments    Comment[]
 }
 
-model RecordingLike {
+model Like {
   id          Int        @id @default(autoincrement())
   userId      Int
   recordingId Int

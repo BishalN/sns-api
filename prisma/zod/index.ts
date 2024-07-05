@@ -1,5 +1,5 @@
 export * from "./user"
 export * from "./follower"
 export * from "./recording"
-export * from "./recordinglike"
+export * from "./like"
 export * from "./comment"
