@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@epic-web/remember':
+        specifier: ^1.1.0
+        version: 1.1.0
       '@hono/node-server':
         specifier: ^1.11.4
         version: 1.11.4
@@ -61,6 +64,9 @@ packages:
     resolution: {integrity: sha512-lF0d1gAc0lYLO9/BAGivwTwE2Sh9h6CHuDcbk5KnGBfIuAsAkDC+Fdat4dkQY3CS/zUWKHRmFEma0B7X132Ymw==}
     peerDependencies:
       zod: ^3.20.2
+
+  '@epic-web/remember@1.1.0':
+    resolution: {integrity: sha512-FIhO7PFUVEbcnrJOtom8gb4GXog4Z44n4Jxwmw2nkKt4mx8I/q/d0O4tMabjYndM1QX2oXvRYzpZxtP61s2P5A==}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -558,6 +564,8 @@ snapshots:
     dependencies:
       openapi3-ts: 4.3.3
       zod: 3.23.8
+
+  '@epic-web/remember@1.1.0': {}
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
