@@ -6,6 +6,7 @@ import { authRoute } from "./routes/auth/auth";
 import { recordingRoute } from "./routes/recording/recording";
 import { logger } from "hono/logger";
 import { PrismaClient } from "@prisma/client";
+import { userRoute } from "./routes/user";
 
 export const app = new OpenAPIHono();
 
@@ -18,6 +19,7 @@ app.use(logger());
 
 app.route("/auth", authRoute);
 app.route("/recording", recordingRoute);
+app.route("/user", userRoute);
 
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   type: "http",
