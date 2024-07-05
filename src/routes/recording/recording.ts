@@ -5,11 +5,20 @@ import { Env } from "../..";
 import {
   createRecordingRoute,
   deleteRecordingRoute,
+  generatePresignedUrlRoute,
   getRecordingByIdRoute,
+  MAX_FILE_SIZE,
   updateRecordingRoute,
 } from "./spec";
 import { db } from "../../utils/db";
 import { User } from "@prisma/client";
+import AWS from "aws-sdk";
+
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
 
 type Variables = {
   currentUser: User;
@@ -23,6 +32,7 @@ recordingRoute.use(async (c, next) => {
     return next();
   }
 
+  // TODO: Fix: here cuz of the variable the type is not being inferred
   const { JWT_SECRET } = env<Env>(c as any);
   const token = c.req.header("authorize");
   if (!token) {
@@ -48,6 +58,25 @@ recordingRoute.use(async (c, next) => {
   }
 
   return next();
+});
+
+recordingRoute.openapi(generatePresignedUrlRoute, async (c) => {
+  const { fileName, fileType, fileSize } = c.req.valid("json");
+
+  if (fileSize > MAX_FILE_SIZE) {
+    return c.json({ message: "File size exceeds the 50MB limit" }, 400);
+  }
+
+  const params = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: fileName,
+    Expires: 60 * 2, // 2 minute
+    ContentType: fileType,
+  };
+
+  const url = await s3.getSignedUrlPromise("putObject", params);
+
+  return c.json({ url }, 200);
 });
 
 recordingRoute.openapi(createRecordingRoute, async (c) => {

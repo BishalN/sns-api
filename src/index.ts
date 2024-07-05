@@ -7,14 +7,7 @@ import { recordingRoute } from "./routes/recording/recording";
 import { logger } from "hono/logger";
 import { PrismaClient } from "@prisma/client";
 
-type Variables = {
-  db: PrismaClient;
-};
-
-export const app = new OpenAPIHono<{ Variables: Variables }>();
-
-// TODO: add db to the context object of hono -> use epic web remember to creater skeleton
-// TODO: add user to the context object of hono using middle ware
+export const app = new OpenAPIHono();
 
 export type Env = {
   JWT_SECRET: string;

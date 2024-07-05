@@ -2,6 +2,58 @@ import { createRoute } from "@hono/zod-openapi";
 import { z } from "zod";
 import { RecordingModel } from "../../../prisma/zod";
 
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+export const generatePresignedUrlRoute = createRoute({
+  method: "post",
+  path: "/generate-presigned-url",
+  security: [{ Bearer: [] }],
+  request: {
+    headers: z.object({
+      authorize: z.string(),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            fileName: z.string(),
+            fileType: z.string(),
+            fileSize: z.number().max(MAX_FILE_SIZE),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Presigned URL generated",
+      content: {
+        "application/json": {
+          schema: z.object({
+            url: z.string(),
+          }),
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    400: {
+      description: "File size exceeds limit",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+  },
+  tags: ["upload"],
+});
+
 export const createRecordingRoute = createRoute({
   method: "post",
   path: "/",
@@ -12,7 +64,7 @@ export const createRecordingRoute = createRoute({
   ],
   request: {
     headers: z.object({
-      // TODO: fix: use authoirzation header instead; this is due to swagger-ui does not allow authorization header
+      // TODO: fix: use authoirzation header instead; this is due to swagger-ui does not allow authorization header otherwise we can use it without any changes
       authorize: z.string(),
     }),
     body: {

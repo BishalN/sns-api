@@ -8,6 +8,8 @@ import { db } from "../../utils/db";
 
 export const authRoute = new OpenAPIHono();
 
+// TODO: Add forgot password route
+
 authRoute.openapi(registerRoute, async (c) => {
   const { email, password } = c.req.valid("json");
 
@@ -36,7 +38,6 @@ authRoute.openapi(loginRoute, async (c) => {
 
   const user = await db.user.findUnique({ where: { email } });
 
-  // TODO: Maybe don't even give a hint through status code use 401 for both
   if (!user) {
     return c.json({ message: "Invalid Credentails" }, 401);
   }
@@ -48,7 +49,7 @@ authRoute.openapi(loginRoute, async (c) => {
   }
 
   const { JWT_SECRET } = env<Env>(c);
-  const token = await signToken(JWT_SECRET, { id: user.id });
+  const token = signToken(JWT_SECRET, { id: user.id });
 
   return c.json(
     {
