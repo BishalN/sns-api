@@ -1,11 +1,6 @@
 import { createRoute } from "@hono/zod-openapi";
 import { z } from "zod";
-import {
-  CommentModel,
-  LikeModel,
-  RecordingModel,
-  RelatedRecordingModel,
-} from "../../../prisma/zod";
+import { CommentModel, RecordingModel } from "../../../prisma/zod";
 import { TestRes } from "./services";
 
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB

@@ -1,11 +1,10 @@
 import { serve } from "@hono/node-server";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
-
-import { authRoute } from "./routes/auth/auth";
-import { recordingRoute } from "./routes/recording/recording";
 import { logger } from "hono/logger";
-import { PrismaClient } from "@prisma/client";
+
+import { authRoute } from "./routes/auth";
+import { recordingRoute } from "./routes/recording";
 import { userRoute } from "./routes/user";
 
 export const app = new OpenAPIHono();
