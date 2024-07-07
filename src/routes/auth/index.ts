@@ -6,10 +6,9 @@ import { signToken } from "../../utils/sign";
 import { loginRoute, registerRoute } from "./spec";
 import { db } from "../../utils/db";
 
-export const authRoute = new OpenAPIHono();
+const authRoute = new OpenAPIHono();
 
 // TODO: Add forgot password route
-
 authRoute.openapi(registerRoute, async (c) => {
   const { email, password } = c.req.valid("json");
 
@@ -60,3 +59,5 @@ authRoute.openapi(loginRoute, async (c) => {
     200
   );
 });
+
+export default authRoute;

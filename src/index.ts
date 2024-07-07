@@ -3,11 +3,11 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { logger } from "hono/logger";
 
-import { authRoute } from "./routes/auth";
+import authRoute from "./routes/auth";
 import { recordingRoute } from "./routes/recording";
 import { userRoute } from "./routes/user";
 
-export const app = new OpenAPIHono();
+const app = new OpenAPIHono();
 
 export type Env = {
   JWT_SECRET: string;
@@ -19,6 +19,10 @@ app.use(logger());
 app.route("/auth", authRoute);
 app.route("/recording", recordingRoute);
 app.route("/user", userRoute);
+
+app.get("/health", async (c) => {
+  return c.json({ status: "ok" });
+});
 
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   type: "http",
@@ -41,3 +45,5 @@ serve({
   fetch: app.fetch,
   port,
 });
+
+export default app;
